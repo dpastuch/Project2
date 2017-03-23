@@ -26,20 +26,12 @@ public class dmp6637 implements PlayerModulePart1 {
         board = new Node[dim*2 + 1][dim*2 + 1];
         this.playerId = playerId;
         for(int i = 0; i <= dim*2; i++) {
-            if(i == 0) {
-                for(int j = 0; j <= dim*2; j++) {
-                    board[i][j] = new Node(1, i, j);
-                }
-            }
             for(int j = 0; j <= dim*2; j++) {
-                if(j == 0) {
-                    board[i][j] = new Node(2, i, j);
-                }
-                else if(((i % 2) == 0) && ((j % 2) == 1)) {
-                    board[i][j] = new Node(1, i, j);
+                if(((i % 2) == 0) && ((j % 2) == 1)) {
+                    board[i][j] = new Node(1, j, i);
                 }
                 else if(((i % 2) == 1) && ((j % 2) == 0)) {
-                    board[i][j] = new Node(2, i, j);
+                    board[i][j] = new Node(2, j, i);
                 }
             }
         }
@@ -89,10 +81,16 @@ public class dmp6637 implements PlayerModulePart1 {
     public boolean hasWonGame(int id) {
         //TODO breadth first search
         if(id == 1) {
-            winningPath(0,1,id, board.length - 1);
+            for(int i = 0; i < ((board.length - 1) / 2) - 1; i++) {
+                if(winningPath(((i + 1) * 2) - 1, 0, id, board.length - 1))
+                    return true;
+            }
         }
         if(id == 2) {
-            winningPath(1,0,id, board.length - 1);
+            for(int i = 0; i < ((board.length - 1) / 2) - 1; i++) {
+                if(winningPath(0, ((i + 1) * 2) - 1, id, board.length - 1))
+                    return true;
+            }
         }
         return false;
     }
@@ -105,7 +103,7 @@ public class dmp6637 implements PlayerModulePart1 {
      */
     private void setNeighbor(Node n, int row, int col) {
         if(row >= 0 && row < board.length && col >= 0 && col < board.length) {
-            if(board[col][row] != null && board[col][row].getId() == playerId) {
+            if(board[col][row] != null && board[col][row].getId() == n.getId()) {
                 n.addNeighbor(board[col][row]);
                 board[col][row].addNeighbor(n);
             }
@@ -134,7 +132,7 @@ public class dmp6637 implements PlayerModulePart1 {
                     return true;
                 }
             }
-            else if(playerId == 2) {
+            if(playerId == 2) {
                 if(curr.getCoordinate().getRow() == dim) {
                     return true;
                 }
@@ -144,7 +142,6 @@ public class dmp6637 implements PlayerModulePart1 {
                     l.addLast(n);
                     s.add(n);
                 }
-
             }
         }
         return false;
